@@ -145,7 +145,7 @@ class Sniffer:
 
     # Toni's code
     def create_filter_panel(self):
-        # Filter Panel
+        #Filter panel
         self.filter_frame = tk.LabelFrame(self.root, text="Filters", padx= 5, pady= 5)
         self.filter_frame.pack(fill=tk.X, padx= 5, pady= 5)
 
@@ -174,7 +174,39 @@ class Sniffer:
 
     # Toni's code
     def apply_filters(self, reset=False):
-        pass
+        #Apply or reset filters and update the packet table
+        if reset:
+            #Clear filters
+            self.filter_protocol = ""
+            self.filter_src_ip = ""
+            self.filter_dst_ip = ""
+            self.protocol_filter.delete(0, tk.END)
+            self.src_ip_filter.delete(0, tk.END)
+            self.dst_ip_filter.delete(0, tk.END)
+        else:
+            #Read filters from GUI
+            self.filter_protocol = self.protocol_filter.get().strip().upper()
+            self.filter_src_ip = self.src_ip_filter.get().strip()
+            self.filter_dst_ip = self.dst_ip_filter.get().strip()
+
+        #Clear the table and re-display filtered packets
+        self.packet_table.delete(*self.packet_table.get_children())
+
+        for packet in self.packet_data:
+            no, protocol, src, dst, lenght, raw_packet = packet
+
+            #Apply filters to previously captured packets
+            matches_protocol = (
+                not self.filter_protocol or protocol.upper() == self.filter_protocol
+            )
+            matches_src_ip = not self.filter_src_ip or src == self.filter_src_ip
+            matches_dst_ip = not self.filter_dst_ip or dst == self.filter_dst_ip
+
+            if matches_protocol and matches_src_ip and matches_dst_ip:
+                #Display the packet
+                self.packet_table.insert(
+                    "", tk.END, values = (no, protocol, src, dst, lenght)
+                )
 
     # Viktor's code - *Copied from Neovim*
     def capture_packets(self):
@@ -242,7 +274,15 @@ class Sniffer:
 
     # Toni's code
     def update_gui(self, no, protocol, src, dst, length):
-        pass
+        print(
+            f"Updating GUI: No = {no}, Protocol = {protocol}, Src = {src}, Dst = {dst}, Lenght = {length}"
+        )
+        #Debug code
+        self.root.after(
+            0, lambda: self.packet_table.insert(
+                "", tk.END, values = (no, protocol, src, dst, length)
+            ),
+        )
     
     # Viktor's code - *Copied from Neovim*
     def show_packet_details(self, event):
