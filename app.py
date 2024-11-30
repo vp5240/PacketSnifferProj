@@ -35,23 +35,134 @@ class Sniffer:
 
     # Dario's code
     def create_widgets(self):
-        pass
+        #Start and Stop buttons
+        self.button_frame = tk.Frame(self.root)
+        self.button_frame.pack(pady=5)
+
+        self.start_button =tk.Button(
+            self.button_frame, text="Start Capture",
+            command=self.start_capture
+        )
+        self.start_button.grid(row=0, column=0, padx=5)
+
+        self.stop_button = tk.Button(
+            self.button_frame,
+            text="Stop Caapture",
+            command=self.stop_capture,
+            state=tk.DISABLED,
+        )
+        self.stop_button.grid(row=0, column=1, padx=5)
+
+        self.quit_button = tk.Button(
+            self.button_frame, text="Quit",
+            command=self.quit_application
+        )
+        self.quit_button.grid(row=0, column=2, padx=5)
+
+
+        #Frame to contaain the packet table and scrollbar
+        self.packet_table_frame = tk.Frame(self.root)
+        self.packet_table_frame.pack(fill=tk.BOTH, expand= True, padx= 5, pady= 5)
+
+        #Scrollbar for the packet table
+        self.packet_scrollbar = tk.Scrollbar(
+            self.packet_table_frame, orient=tk.VERTICAL
+        )
+        self.packet_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        #Table to display packet data
+        self.packet_table = ttk.Treeview(
+            self.packet_table_frame,
+            columns=("No.","Protocol","Source","Destination","Lenght"),
+            show="headings",
+            yscrollcommand=self.packet_scrollbar.set,
+            #Attach scrollbar
+        )
+        self.packet_table.heading("No.", text="No.")
+        self.packet_table.heading("Protocol", text="Protocol")
+        self.packet_table.heading("Source", text="Source")
+        self.packet_table.heading("Destination", text="Destination")
+        self.packet_table.heading("Lenght", text="Lenght")
+        self.packet_table.column("No.",width=50)
+        self.packet_table.pack(side=tk.LEFT, fill=tk.BOTH, expand= True)
+
+        # Configure scrollbar to work with the table
+
+        self.packet_scrollbar.config(command=self.packet_table.yview)
+
+        # Packet Detials Viewer
+
+        self.details_frame =tk.LabelFrame(
+            self.root, text="Packet Details", padx= 5, pady= 5
+        )
+        self.details_frame.pack(fill=tk.BOTH, expand= True, padx= 5 , pady= 5)
+
+        self.details_text = tk.Text(self.details_frame, wrap= tk.WORD, height=10)
+        self.details_text.pack(fill=tk.BOTH,expand=True)
+
+        # Event binding for row selection
+        self.packet_table.bind("<<TreeviewSelect>>", self.show_packet_details)
+
+
     
     # Dario's code
     def quit_application(self):
-        pass
+        self.capturing = False # Stop capturing
+        self.root.destroy() # Close the GUI
+        
+
+        
+
+            
+        
 
     # Dario's code
     def start_capture(self):
-        pass
+        self.capuring = True
+        self.start_button.config(state=tk.DISABLED)
+        self.stop_button.config(state=tk.NORMAL)
+        self.packet_data.clear()
+        
+        self.packet_table.delete(*self.packet_table.get_children())
+
+        # Start packet capture thread
+        self.capture_thread = threading.Thread(target=self.capture_packets, daemon=True)
+        self.capture_thread.start()
 
     # Dario's code
     def stop_capture(self):
-        pass
+        self.capturing = False
+        self.start_button.config(state=tk.NORMAL)
+        self.stop_button.config(state=tk.DISABLED)
 
     # Toni's code
     def create_filter_panel(self):
-        pass
+        # Filter Panel
+        self.filter_frame = tk.LabelFrame(self.root, text="Filters", padx= 5, pady= 5)
+        self.filter_frame.pack(fill=tk.X, padx= 5, pady= 5)
+
+        tk.Label(self.filter_frame, text="Protocol:").grid(row=0, column=0, padx=5)
+        self.protocol_filter = tk.Entry(self.filter_frame,width=10)
+        self.protocol_filter.grid(row=0, column=1, padx=5)
+
+        tk.Label(self.filter_frame, text="SourceIP:").grid(row=0, column=2, padx=5)
+        self.src_ip_filter = tk.Entry(self.filter_frame,width=15)
+        self.src_ip_filter.grid(row=0, column=3, padx=5)
+
+        tk.Label(self.filter_frame, text="DestinationIP:").grid(row=0, column=4, padx=5)
+        self.dst_ip_filter = tk.Entry(self.filter_frame,width=15)
+        self.src_ip_filter.grid(row=0, column=5, padx=5)
+
+        self.apply_filters_button = tk.Button(
+            self.filter_frame, text="Apply Filters", command=self.apply_filters
+        )
+        self.apply_filters_button.grid(row=0, column=6, padx=5)
+
+        self.reset_filter_button = tk.Button(self.filter_frame, text="Reset Filters", command=lambda: self.apply_filters(reset=True),)
+        self.reset_filter_button.grid(row=0, column=7, padx=5)
+
+
+
 
     # Toni's code
     def apply_filters(self, reset=False):
@@ -231,11 +342,77 @@ class Sniffer:
 
     # Dario's code
     def create_menu(self):
-        pass
+        """"Create a menu for the application."""
+        menu_bar = tk.Menu(self.root)
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        file_menu.add_command(label="Import.pcap",command=self.import_pcap)
+        file_menu.add_separator()
+        file_menu.add_command(label="Quit",command=self.quit_application)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        self.root.config(menu=menu_bar)
 
     # Dario's code
     def import_pcap(self):
-        pass
+        """"Import packets from a .pcap, .pcapng, or .cap file."""
+        file_path = filedialog.askopenfilename(
+            title="Open Capture File",
+            filetypes=[
+                ("Packet Capture Files", "*.pcap *.pcapng *.cap"),
+                ("PCAP files", "*.pcaap"),
+                ("PCAPNG files", "*.pcapng"),
+                ("CAP files", "*.cap"),
+            ],
+        )
+        if not file_path:
+            return # User canceled
+        
+        try:
+            self.packet_table.delete(
+                *self.packet_table.get_children()
+            ) # Clear existing display
+            self.packet_data.clear() # Clear existing packet storaage
+
+            capture = pyshark.FileCapture(file_path)
+            packet_number = 1
+
+            for packet in capture:
+                try:
+                    # Ensure the packet has an IP layer
+                    protocol = packet.highest_layer
+                    src = packet.ip.src
+                    dst = packet.ip.dst
+                    length = len(packet)
+
+                    # Save the packet from filtering adn details
+
+                    raw_packet = str(packet)
+                    self.packet_data.append(
+                        (packet_number, protocol, src, dst, length, raw_packet)
+                    )
+
+                     # Apply current filters
+                    matches_protocol = (
+                        not self.filter_protocol or protocol.upper() == self.filter_protocol
+                    )
+                    matches_src_ip = not self.filter_src_ip or src == self.filter_src_ip
+                    matches_dst_ip = not self.filter_dst_ip or dst == self.filter_dst_ip
+
+                    if matches_protocol and matches_src_ip and matches_dst_ip:
+                        self.update_gui(packet_number, protocol, src, dst, length)
+
+                        #Update statistic
+                        self.update_statistics(protocol)
+                        packet_number += 1
+
+                except AttributeError:
+                    # Skip packets without IP attributes
+                    continue
+
+                capture.close()  #Ensure file is closed after reading
+
+        except Exception as e:
+            print(f"Error importing file:{e}")
+
 
 
 if __name__ == '__main__':
