@@ -1,3 +1,11 @@
+'''
+@ASSESSME.USERID: Alcoholics
+@ASSESSME.AUTHOR: vp5240, dk9397, tt4004
+@ASSESSME.DESCRIPTION: Packet Sniffer
+@ASSESSME.ANALYZE: YES
+@ASSESSME.INTENSITY: LOW
+'''
+
 import tkinter as tk
 from tkinter import ttk, filedialog
 import pyshark
