@@ -28,7 +28,7 @@ class Sniffer:
         self.capture_thread = None
         self.packet_data = []
 
-        self.interface = "wlp2s0" # Default interface - Change this to your interface
+        self.interface = "wlp2s0" # Default interface - Change as per your system
 
         # Filter initing
         self.filter_protocol = ""
