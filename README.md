@@ -129,6 +129,27 @@ Before running the application, you need to set the correct network interface fo
 
 ---
 
+## **Platform Compatibility**
+This application is **designed and tested primarily for Linux** environments. While it can work on Windows, some adjustments are necessary to ensure compatibility. These adjustments include:
+
+1. **Administrator Privileges**:
+   - Run the application as an administrator to ensure proper access to network interfaces.
+
+2. **Install TShark**:
+   - Ensure that the **TShark** component of Wireshark is correctly installed and accessible, meaning it is in PATH.
+
+3. **Event Loop Error**:
+   - On Windows, the application might encounter an `asyncio` event loop error in threaded environments. If this happens:
+     - Modify the code to create a new event loop in the capture thread.
+     - Also, install `pyshark` with specific Windows support.
+
+4. **Tested Machines**:
+   - These steps have been tested on certain Windows setups, but we cannot guarantee 100% functionality across all setups.
+
+**For best results**, we recommend using this application on a Linux system where it has been fully tested and optimized.
+
+---
+
 ## **Testing Results**
 ### Functionality Tests
 - **Real-Time Packet Capture**: Successfully captured and displayed packets across multiple environments.
