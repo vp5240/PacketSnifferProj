@@ -40,7 +40,6 @@ class Sniffer:
         self.create_statistics_panel()
         self.create_menu()
 
-
     # Dario's code
     def create_widgets(self):
         #Start and Stop buttons
@@ -55,7 +54,7 @@ class Sniffer:
 
         self.stop_button = tk.Button(
             self.button_frame,
-            text="Stop Caapture",
+            text="Stop Capture",
             command=self.stop_capture,
             state=tk.DISABLED,
         )
@@ -67,8 +66,7 @@ class Sniffer:
         )
         self.quit_button.grid(row=0, column=2, padx=5)
 
-
-        #Frame to contaain the packet table and scrollbar
+        #Frame to contain the packet table and scrollbar
         self.packet_table_frame = tk.Frame(self.root)
         self.packet_table_frame.pack(fill=tk.BOTH, expand= True, padx= 5, pady= 5)
 
@@ -98,7 +96,7 @@ class Sniffer:
 
         self.packet_scrollbar.config(command=self.packet_table.yview)
 
-        # Packet Detials Viewer
+        # Packet Details Viewer
 
         self.details_frame =tk.LabelFrame(
             self.root, text="Packet Details", padx= 5, pady= 5
@@ -110,20 +108,12 @@ class Sniffer:
 
         # Event binding for row selection
         self.packet_table.bind("<<TreeviewSelect>>", self.show_packet_details)
-
-
     
     # Dario's code
     def quit_application(self):
         self.capturing = False # Stop capturing
-        self.root.destroy() # Close the GUI
+        self.root.destroy() # Close the GUI       
         
-
-        
-
-            
-        
-
     # Dario's code
     def start_capture(self):
         self.capuring = True
@@ -168,9 +158,6 @@ class Sniffer:
 
         self.reset_filter_button = tk.Button(self.filter_frame, text="Reset Filters", command=lambda: self.apply_filters(reset=True),)
         self.reset_filter_button.grid(row=0, column=7, padx=5)
-
-
-
 
     # Toni's code
     def apply_filters(self, reset=False):
@@ -271,7 +258,6 @@ class Sniffer:
                 print(f"Error capturing packet: {e}")
                 continue
         
-
     # Toni's code
     def update_gui(self, no, protocol, src, dst, length):
         print(
@@ -460,8 +446,6 @@ class Sniffer:
 
         except Exception as e:
             print(f"Error importing file:{e}")
-
-
 
 if __name__ == '__main__':
     root = tk.Tk()

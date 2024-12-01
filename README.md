@@ -78,6 +78,34 @@ This packet sniffer includes:
 
 ---
 
+## **Configuration**
+Before running the application, you need to set the correct network interface for live packet capture.
+
+1. **Edit the Network Interface**:
+   - Open the `app.py` file in a text editor.
+   - Navigate to **line 25**, which contains the following code:
+     ```python
+     self.interface = "wlp2s0"  # Default interface - Change as per your system
+     ```
+   - Replace `"wlp2s0"` with the name of your network interface.
+
+2. **Find Your Network Interface**:
+   - **On Windows**:
+     1. Open Command Prompt and type:
+        ```cmd
+        ipconfig
+        ```
+     2. Look for the **Ethernet adapter** or **Wi-Fi** section. The network interface name will typically be `Ethernet` or `Wi-Fi`.
+   - **On Linux (e.g., Arch Linux)**:
+     1. Open a terminal and type:
+        ```bash
+        ip addr
+        ```
+     2. Look for an interface with a valid IP address. Common examples include `wlp2s0`, `eth0`, or `enp0s3`.
+     3. Use the detected interface name (e.g., `wlp2s0`) and replace the default value in the `app.py` file.
+
+---
+
 ## **Troubleshooting**
 1. **Permission Errors (Linux)**:
    - Add your user to the `wireshark` group and log out/in:
