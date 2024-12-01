@@ -68,18 +68,19 @@ class Sniffer:
 
         #Frame to contain the packet table and scrollbar
         self.packet_table_frame = tk.Frame(self.root)
-        self.packet_table_frame.pack(fill=tk.BOTH, expand= True, padx= 5, pady= 5)
+        self.packet_table_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         #Scrollbar for the packet table
         self.packet_scrollbar = tk.Scrollbar(
             self.packet_table_frame, orient=tk.VERTICAL
+
         )
         self.packet_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         #Table to display packet data
         self.packet_table = ttk.Treeview(
             self.packet_table_frame,
-            columns=("No.","Protocol","Source","Destination","Lenght"),
+            columns=("No.","Protocol","Source","Destination","Length"),
             show="headings",
             yscrollcommand=self.packet_scrollbar.set,
             #Attach scrollbar
@@ -88,7 +89,7 @@ class Sniffer:
         self.packet_table.heading("Protocol", text="Protocol")
         self.packet_table.heading("Source", text="Source")
         self.packet_table.heading("Destination", text="Destination")
-        self.packet_table.heading("Lenght", text="Lenght")
+        self.packet_table.heading("Length", text="Length")
         self.packet_table.column("No.",width=50)
         self.packet_table.pack(side=tk.LEFT, fill=tk.BOTH, expand= True)
 
@@ -116,7 +117,7 @@ class Sniffer:
         
     # Dario's code
     def start_capture(self):
-        self.capuring = True
+        self.capturing = True
         self.start_button.config(state=tk.DISABLED)
         self.stop_button.config(state=tk.NORMAL)
         self.packet_data.clear()
@@ -149,7 +150,7 @@ class Sniffer:
 
         tk.Label(self.filter_frame, text="DestinationIP:").grid(row=0, column=4, padx=5)
         self.dst_ip_filter = tk.Entry(self.filter_frame,width=15)
-        self.src_ip_filter.grid(row=0, column=5, padx=5)
+        self.dst_ip_filter.grid(row=0, column=5, padx=5)
 
         self.apply_filters_button = tk.Button(
             self.filter_frame, text="Apply Filters", command=self.apply_filters
@@ -180,7 +181,7 @@ class Sniffer:
         self.packet_table.delete(*self.packet_table.get_children())
 
         for packet in self.packet_data:
-            no, protocol, src, dst, lenght, raw_packet = packet
+            no, protocol, src, dst, length, raw_packet = packet
 
             #Apply filters to previously captured packets
             matches_protocol = (
@@ -192,7 +193,7 @@ class Sniffer:
             if matches_protocol and matches_src_ip and matches_dst_ip:
                 #Display the packet
                 self.packet_table.insert(
-                    "", tk.END, values = (no, protocol, src, dst, lenght)
+                    "", tk.END, values = (no, protocol, src, dst, length)
                 )
 
     # Viktor's code - *Copied from Neovim*
@@ -261,7 +262,7 @@ class Sniffer:
     # Toni's code
     def update_gui(self, no, protocol, src, dst, length):
         print(
-            f"Updating GUI: No = {no}, Protocol = {protocol}, Src = {src}, Dst = {dst}, Lenght = {length}"
+            f"Updating GUI: No = {no}, Protocol = {protocol}, Src = {src}, Dst = {dst}, Length = {length}"
         )
         #Debug code
         self.root.after(
@@ -392,7 +393,7 @@ class Sniffer:
             title="Open Capture File",
             filetypes=[
                 ("Packet Capture Files", "*.pcap *.pcapng *.cap"),
-                ("PCAP files", "*.pcaap"),
+                ("PCAP files", "*.pcap"),
                 ("PCAPNG files", "*.pcapng"),
                 ("CAP files", "*.cap"),
             ],
@@ -417,7 +418,7 @@ class Sniffer:
                     dst = packet.ip.dst
                     length = len(packet)
 
-                    # Save the packet from filtering adn details
+                    # Save the packet from filtering and details
 
                     raw_packet = str(packet)
                     self.packet_data.append(
@@ -442,7 +443,7 @@ class Sniffer:
                     # Skip packets without IP attributes
                     continue
 
-                capture.close()  #Ensure file is closed after reading
+            capture.close()  #Ensure file is closed after reading
 
         except Exception as e:
             print(f"Error importing file:{e}")
